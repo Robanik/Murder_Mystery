@@ -438,7 +438,9 @@ CreateButton(VisualTab, "China Hat", function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/Murder_Mystery/refs/heads/main/Assets/ChinaHat.lua"))()
 end)
 
-
+CreateButton(VisualTab, "Circle", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/Murder_Mystery/refs/heads/main/Assets/Circle.lua"))()
+end)
 
 --- === Auto ===
 

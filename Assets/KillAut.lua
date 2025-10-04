@@ -1,6 +1,4 @@
--- MM2 AUTO KILL (БЕЗ GUI)
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
@@ -8,11 +6,13 @@ local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
 -- Настройки
-local KILL_KEY = Enum.KeyCode.Q  -- Клавиша для убийства
-local TELEPORT_DISTANCE = 3  -- Расстояние телепорта
+local TELEPORT_DISTANCE = 3
+local AUTO_KILL_DELAY = 0.3  -- Задержка между авто-убийствами (секунды)
 
 local currentRole = "Innocent"
 local teleportConnection = nil
+local autoKillConnection = nil
+local lastKillTime = 0
 
 -- 🎭 ОПРЕДЕЛЕНИЕ РОЛИ
 local function getRole()
@@ -87,17 +87,89 @@ local function getAlivePlayers()
     return alivePlayers
 end
 
--- 📍 ЗАПУСК ВИЗУАЛЬНОГО ТЕЛЕПОРТА
+-- ⚔️ АВТОМАТИЧЕСКОЕ УБИЙСТВО (для мобилок)
+local function autoKill()
+    local currentTime = tick()
+    if currentTime - lastKillTime < AUTO_KILL_DELAY then return end
+    
+    currentRole = getRole()
+    
+    if currentRole == "Murderer" then
+        -- Ищем нож
+        local knife = nil
+        for _, item in pairs(character:GetChildren()) do
+            if item:IsA("Tool") and (item.Name:lower():find("knife") or item.Name:lower():find("нож")) then
+                knife = item
+                break
+            end
+        end
+        
+        if not knife then
+            for _, item in pairs(player.Backpack:GetChildren()) do
+                if item:IsA("Tool") and (item.Name:lower():find("knife") or item.Name:lower():find("нож")) then
+                    knife = item
+                    character.Humanoid:EquipTool(knife)
+                    break
+                end
+            end
+        end
+        
+        if knife then
+            local alivePlayers = getAlivePlayers()
+            if #alivePlayers > 0 then
+                knife:Activate()
+                lastKillTime = currentTime
+                print("🔪 Атака! Целей: " .. #alivePlayers)
+            end
+        end
+        
+    elseif currentRole == "Sheriff" then
+        local murderer = findMurderer()
+        if murderer then
+            -- Ищем пистолет
+            local gun = nil
+            for _, item in pairs(character:GetChildren()) do
+                if item:IsA("Tool") and (item.Name:lower():find("gun") or item.Name:lower():find("revolver")) then
+                    gun = item
+                    break
+                end
+            end
+            
+            if not gun then
+                for _, item in pairs(player.Backpack:GetChildren()) do
+                    if item:IsA("Tool") and (item.Name:lower():find("gun") or item.Name:lower():find("revolver")) then
+                        gun = item
+                        character.Humanoid:EquipTool(gun)
+                        break
+                    end
+                end
+            end
+            
+            if gun then
+                gun:Activate()
+                lastKillTime = currentTime
+                print("🔫 Выстрел по убийце!")
+            end
+        end
+    end
+end
+
+-- 📍 ЗАПУСК ТЕЛЕПОРТА + АВТО-УБИЙСТВА
 local function startTeleport()
+    -- Останавливаем старые соединения
     if teleportConnection then
         teleportConnection:Disconnect()
+    end
+    if autoKillConnection then
+        autoKillConnection:Disconnect()
     end
     
     currentRole = getRole()
     
     if currentRole == "Murderer" then
-        print("🔪 MURDERER: Телепортирую всех к себе...")
+        print("🔪 MURDERER: Телепортирую всех + АВТО-УБИЙСТВО!")
         
+        -- Телепорт
         teleportConnection = RunService.Heartbeat:Connect(function()
             local alivePlayers = getAlivePlayers()
             local myPosition = humanoidRootPart.CFrame
@@ -106,7 +178,6 @@ local function startTeleport()
                 if otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
                     local otherRoot = otherPlayer.Character.HumanoidRootPart
                     
-                    -- Расставляем по кругу вокруг себя
                     local angle = (i / #alivePlayers) * math.pi * 2
                     local offsetX = math.cos(angle) * TELEPORT_DISTANCE
                     local offsetZ = math.sin(angle) * TELEPORT_DISTANCE
@@ -116,89 +187,34 @@ local function startTeleport()
             end
         end)
         
-    elseif currentRole == "Sheriff" then
-        print("🔫 SHERIFF: Телепортирую убийцу к себе...")
+        -- Авто-убийство
+        autoKillConnection = RunService.Heartbeat:Connect(function()
+            autoKill()
+        end)
         
+    elseif currentRole == "Sheriff" then
+        print("🔫 SHERIFF: Телепортирую убийцу + АВТО-СТРЕЛЬБА!")
+        
+        -- Телепорт
         teleportConnection = RunService.Heartbeat:Connect(function()
             local murderer = findMurderer()
             if murderer and murderer.Character and murderer.Character:FindFirstChild("HumanoidRootPart") then
                 local murdererRoot = murderer.Character.HumanoidRootPart
                 local myPosition = humanoidRootPart.CFrame
                 
-                -- Телепортируем прямо перед собой
                 murdererRoot.CFrame = myPosition * CFrame.new(0, 0, -TELEPORT_DISTANCE)
             end
+        end)
+        
+        -- Авто-стрельба
+        autoKillConnection = RunService.Heartbeat:Connect(function()
+            autoKill()
         end)
         
     else
         print("😐 INNOCENT: Нет оружия")
     end
 end
-
--- ⚔️ УБИЙСТВО
-local function performKill()
-    currentRole = getRole()
-    
-    if currentRole == "Murderer" then
-        print("🔪 УБИВАЮ ВСЕХ!")
-        
-        -- Ищем нож
-        local knife = player.Backpack:FindFirstChildWhichIsA("Tool") or character:FindFirstChildWhichIsA("Tool")
-        
-        if knife then
-            -- Экипируем
-            if knife.Parent == player.Backpack then
-                character.Humanoid:EquipTool(knife)
-            end
-            
-            task.wait(0.1)
-            
-            -- Активируем для каждого игрока
-            local alivePlayers = getAlivePlayers()
-            for _, otherPlayer in pairs(alivePlayers) do
-                knife:Activate()
-                task.wait(0.05)
-            end
-            
-            print("✅ Атаковал " .. #alivePlayers .. " игроков!")
-        else
-            print("❌ Нож не найден!")
-        end
-        
-    elseif currentRole == "Sheriff" then
-        print("🔫 СТРЕЛЯЮ В УБИЙЦУ!")
-        
-        -- Ищем пистолет
-        local gun = player.Backpack:FindFirstChildWhichIsA("Tool") or character:FindFirstChildWhichIsA("Tool")
-        
-        if gun then
-            -- Экипируем
-            if gun.Parent == player.Backpack then
-                character.Humanoid:EquipTool(gun)
-            end
-            
-            task.wait(0.1)
-            
-            -- Стреляем
-            gun:Activate()
-            print("✅ Выстрел произведён!")
-        else
-            print("❌ Пистолет не найден!")
-        end
-        
-    else
-        print("❌ Ты не Murderer и не Sheriff!")
-    end
-end
-
--- 🎮 КЛАВИША Q ДЛЯ УБИЙСТВА
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    
-    if input.KeyCode == KILL_KEY then
-        performKill()
-    end
-end)
 
 -- 🔄 АВТООБНОВЛЕНИЕ РОЛИ
 task.spawn(function()
@@ -210,8 +226,6 @@ task.spawn(function()
         if newRole ~= currentRole then
             currentRole = newRole
             print("🔄 Роль изменилась: " .. currentRole)
-            
-            -- Перезапускаем телепорт
             startTeleport()
         end
     end
@@ -225,17 +239,20 @@ player.CharacterAdded:Connect(function(newCharacter)
     if teleportConnection then
         teleportConnection:Disconnect()
     end
+    if autoKillConnection then
+        autoKillConnection:Disconnect()
+    end
     
-    task.wait(2)  -- Ждём загрузки
+    task.wait(2)
     currentRole = getRole()
     print("🔄 Респавн! Роль: " .. currentRole)
     startTeleport()
 end)
 
 -- 🚀 ЗАПУСК
-task.wait(2)  -- Ждём полной загрузки
+task.wait(2)
 currentRole = getRole()
-print("🔥 MM2 AUTO KILL АКТИВИРОВАН!")
+print("AUTO KILL АКТИВИРОВАН! | BT ROBANIK")
+print("Играешь на мобилке!! загрузка.. готово")
 print("🎮 Роль: " .. currentRole)
-print("⚔️ Нажми Q для убийства")
 startTeleport()

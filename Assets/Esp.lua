@@ -14,7 +14,7 @@ local esp = {
     lines = true,
     names = true,
     distance = true,
-    chams = false
+    chams = true,
 }
 
 -- Drawings storage

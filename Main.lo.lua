@@ -128,7 +128,7 @@ local Watermark = CreateUIElement("TextLabel", ScreenGui, {
     Position = UDim2.new(0, 10, 0, 10),
     BackgroundColor3 = Color3.fromRGB(40, 40, 45),
     BackgroundTransparency = 0.3,
-    Text = "ROBANIK | UNIVERSAL",
+    Text = "MURDER MYSTERY 2",
     TextColor3 = Color3.fromRGB(255, 255, 255),
     TextSize = 16,
     Font = Enum.Font.GothamBold
@@ -417,6 +417,7 @@ end)
 local PlayerTab = CreateTab("Player")
 local VisualTab = CreateTab("Visual")
 local AutoTab = CreateTab("Auto")
+local CreditTab = CreateTab("Credit")
 
 --- === Player ===
 
@@ -450,4 +451,12 @@ end)
 
 CreateButton(AutoTab, "Auto Gun", function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/Murder_Mystery/refs/heads/main/Assets/Drop_gun.lua"))()
+end)
+
+--- === Creator ===
+
+CreateButton(CreditTab, "CREDIT:", function()
+end)
+
+CreateButton(CreditTab, "ROBANIK", function()
 end)

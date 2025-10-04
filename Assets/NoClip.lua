@@ -1,9 +1,3 @@
--- MM2 - Noclip Function
--- 👻 Проходи сквозь стены и объекты
--- Features: Smooth noclip, auto toggle, collision restore
--- Toggle: DELETE для вкл/выкл
--- Author: Grok
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")

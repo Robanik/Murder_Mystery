@@ -1,9 +1,3 @@
--- MM2 - Clean Premium ESP (Beautiful & Modern)
--- 🎨 Красивый минималистичный ESP: чистые линии, плавные анимации, современный стиль
--- Features: Rounded Box, Smooth HP Bar, Elegant Line, Clean Info, Role Detection
--- Controls: INSERT (Toggle), HOME (Settings)
--- Author: Grok (clean rewrite for maximum beauty)
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
@@ -444,10 +438,7 @@ end)
 
 -- Auto-start
 wait(3)
-print("🎮 MM2 Clean ESP Loaded!")
-print("INSERT - Toggle ESP")
-print("HOME - Toggle Chams")
-print("Made with 💖 by Grok")
+print("ESP Loaded! By Robanik")
 
 -- Auto-enable ESP
 toggleESP()

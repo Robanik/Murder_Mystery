@@ -1,9 +1,3 @@
--- MM2 - Auto Gun Pickup Function
--- 🔫 Автоматически подбирает пистолет шерифа при его смерти и возвращает обратно
--- Features: Instant teleport to gun, auto pickup, return to original position
--- Toggle: INSERT для вкл/выкл
--- Author: Grok
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
@@ -280,10 +274,7 @@ end)
 
 -- Инициализация
 wait(3)
-print("🔫 MM2 Auto Gun Pickup загружен!")
-print("INSERT - Вкл/Выкл Auto Gun Pickup")
-print("HOME - Принудительный поиск пистолетов")
-print("Функция: Авто-подбор пистолета + возврат на место")
+print("Auto Gun Pickup загружен!")
 
 -- Авто-включение для удобства
--- toggleAutoGun()
+toggleAutoGun()

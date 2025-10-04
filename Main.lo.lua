@@ -418,3 +418,11 @@ local PlayerTab = CreateTab("Player")
 local EspTab = CreateTab("Esp")
 
 -- Buttons
+
+CreateButton(PlayerTab, "inf jump", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/Murder_Mystery/refs/heads/main/Assets/Inf_jump.lua"))()
+end)
+
+CreateButton(PlayerTab, "NoClip", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/Murder_Mystery/refs/heads/main/Assets/NoClip.lua"))()
+end)

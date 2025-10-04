@@ -415,7 +415,7 @@ end)
 
 -- Create Tabs
 local PlayerTab = CreateTab("Player")
-local EspTab = CreateTab("Esp")
+local VisualTab = CreateTab("Visual")
 local AutoTab = CreateTab("Auto")
 
 --- === Player ===
@@ -428,7 +428,16 @@ CreateButton(PlayerTab, "NoClip", function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/Murder_Mystery/refs/heads/main/Assets/NoClip.lua"))()
 end)
 
---- === Esp ===
+--- === Visual ===
+
+CreateButton(VisualTab, "Esp", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/Murder_Mystery/refs/heads/main/Assets/Esp.lua"))()
+end)
+
+CreateButton(VisualTab, "China Hat", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/Murder_Mystery/refs/heads/main/Assets/ChinaHat.lua"))()
+end)
+
 
 
 --- === Auto ===
